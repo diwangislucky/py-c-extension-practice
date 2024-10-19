@@ -27,3 +27,21 @@ PyObject * add(PyObject *self, PyObject *args) {
 
 	return Py_BuildValue("is", num1 + num2, eq);
 }
+
+PyObject * arg_passing_test(PyObject *self, PyObject *args) {
+	int num1, num2, num3, num4, num5, num6;
+
+	if(!PyArg_ParseTuple(args, "iiiiii", &num1, &num2, &num3, 
+		&num4, &num5, &num6))
+		return NULL;
+
+	// these two lets us release the global interpreter lock in C
+	// however, this means we aren't allowed tokk
+	Py_BEGIN_ALLOW_THREADS;
+	assert(!PyGILState_Check());
+	printf("Hello world, maybe?\n");
+
+	Py_END_ALLOW_THREADS;
+	
+	return Py_BuildValue("iiiiii", num6, num5, num4, num3, num2, num1);
+}
